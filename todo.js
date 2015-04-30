@@ -1,19 +1,45 @@
+Tasks = new Meteor.Collection('tasks');
+
 if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault('counter', 0);
+  Template.hello.rendered = function() {
+    new Vue({
+      el: '#vue-demo',
+      data: {
+        message: ""
+      },
+      sync: {
+        "tasks" : function(){
+          return Tasks.find();
+        }
+      },
+      methods: {
+        addTask : function(){
+          this.massage = "";
 
-  Template.hello.helpers({
-    counter: function () {
-      return Session.get('counter');
-    }
-  });
+          if (! Meteor.userId()) {
+            this.message = "ログインしてください！";
+            throw new Meteor.Error("not-authorized");
+          }
 
-  Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set('counter', Session.get('counter') + 1);
-    }
-  });
+          var self = this;
+          Tasks.insert({
+            name: this.taskName,
+            createdAt: new Date(),
+            owner: Meteor.userId(),
+            username: Meteor.user().services.twitter.screenName
+          }, function(err, id){
+            if(err){
+              console.warn(err);
+            }
+            self.taskName = "";
+          })
+        },
+        removeTask : function(id){
+          Tasks.remove(id)
+        }
+      }
+    });
+  }
 }
 
 if (Meteor.isServer) {

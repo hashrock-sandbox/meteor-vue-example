@@ -3,12 +3,22 @@
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
-
+  <h1>Meteor BBS</h1>
+  {{> loginButtons}}
   {{> hello}}
 </body>
 
 <template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+    <div id="vue-demo">
+        <p>[[message]]</p>
+        <ul>
+            <li v-repeat="task : tasks">
+                [[task.username]]
+                [[task.name]]
+                <button v-on="click: removeTask(task._id)">x</button>
+            </li>
+        </ul>
+        <input v-model="taskName" />
+        <button v-on="click: addTask(taskName)">Add Task</button>
+    </div>
 </template>
