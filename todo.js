@@ -20,19 +20,8 @@ if (Meteor.isClient) {
             this.message = "ログインしてください！";
             throw new Meteor.Error("not-authorized");
           }
-
-          var self = this;
-          Tasks.insert({
-            name: this.taskName,
-            createdAt: new Date(),
-            owner: Meteor.userId(),
-            username: Meteor.user().services.twitter.screenName
-          }, function(err, id){
-            if(err){
-              console.warn(err);
-            }
-            self.taskName = "";
-          })
+          Meteor.call('insertTask',this.taskName);
+          this.taskName = "";
         },
         removeTask : function(id){
           Tasks.remove(id)
@@ -45,5 +34,16 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
   Meteor.startup(function () {
     // code to run on server at startup
+  });
+
+  Meteor.methods({
+    'insertTask':function(taskName){
+      Tasks.insert({
+        name: taskName,
+        createdAt: new Date(),
+        owner: Meteor.userId(),
+        username: Meteor.user().services.twitter.screenName
+      });
+    }
   });
 }
